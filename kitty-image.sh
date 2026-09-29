@@ -2,11 +2,68 @@
 # ʕ •ᴥ•ʔ✿ crest pinned to Kitty's bottom-right cell corner ✿ ʕ •ᴥ•ʔ
 # Origin is always (cols, rows): works across splits, stacks, and resizes.
 # Background image survives Cursor TUI redraws; canvas is 1:1 with the pane.
+#
+# Icon pack: HORDE_ICON=crest|axe|skull|wolf|fist|hammer|potion|shield|axe-wow|skull-wow
+#            HORDE_ICON=cycle   rotate on each paint
+#            HORDE_ICON=random  pick at random each paint
 set -u
 
-src=${1:-$HOME/.cursor/assets/horde-agent.png}
+icons_dir=${HORDE_ICONS_DIR:-$HOME/.cursor/assets/icons}
+icon_name=${HORDE_ICON:-crest}
 out=${2:-$HOME/.cursor/assets/horde-bg-corner.png}
 meta=${HORDE_BG_META:-$HOME/.cursor/assets/.horde-bg-size}
+
+resolve_icon() {
+  local name=$1
+  local list=()
+  local f
+  if [[ -d "$icons_dir" ]]; then
+    for f in "$icons_dir"/*.png; do
+      [[ -f "$f" ]] && list+=("$f")
+    done
+  fi
+  if ((${#list[@]} == 0)); then
+    printf '%s\n' "${1:-$HOME/.cursor/assets/horde-agent.png}"
+    return
+  fi
+  case "$name" in
+    cycle)
+      local i=0
+      if [[ -f "$HOME/.cursor/assets/.horde-icon-i" ]]; then
+        i=$(cat "$HOME/.cursor/assets/.horde-icon-i" 2>/dev/null || echo 0)
+      fi
+      [[ "$i" =~ ^[0-9]+$ ]] || i=0
+      local pick=${list[$((i % ${#list[@]}))]}
+      printf '%s' $((i + 1)) > "$HOME/.cursor/assets/.horde-icon-i"
+      printf '%s\n' "$pick"
+      ;;
+    random)
+      printf '%s\n' "${list[RANDOM % ${#list[@]}]}"
+      ;;
+    *)
+      if [[ -f "$icons_dir/$name.png" ]]; then
+        printf '%s\n' "$icons_dir/$name.png"
+      elif [[ -f "$name" ]]; then
+        printf '%s\n' "$name"
+      elif [[ -f "$HOME/.cursor/assets/horde-agent.png" ]]; then
+        printf '%s\n' "$HOME/.cursor/assets/horde-agent.png"
+      else
+        printf '%s\n' "${list[0]}"
+      fi
+      ;;
+  esac
+}
+
+# arg1 may be a path or an icon name; HORDE_ICON wins when arg omitted
+if [[ $# -ge 1 && -n "${1:-}" ]]; then
+  if [[ -f "$1" ]]; then
+    src=$1
+  else
+    src=$(resolve_icon "$1")
+  fi
+else
+  src=$(resolve_icon "$icon_name")
+fi
 
 # size in cells (drawn from the bottom-right origin)
 wid=${HORDE_CREST_COLS:-7}
@@ -33,6 +90,8 @@ export KITTY_LISTEN_ON="$to"
 export HORDE_CREST_COLS="$wid" HORDE_CREST_ROWS="$hid"
 export HORDE_PAD_RIGHT="$right_pad" HORDE_PAD_BOTTOM="$bottom_pad"
 export KITTY_PID="${KITTY_PID:-}"
+# bust cache when icon changes
+export HORDE_SRC_KEY="$src"
 
 KITTY_RC="$to" python3 - "$src" "$out" "$meta" <<'PY' || exit 0
 import json, os, subprocess, sys
@@ -112,7 +171,7 @@ ch = max(1, int(round(hid * cell_h)))
 x = min(max(0, x), max(0, W - cw))
 y = min(max(0, y), max(0, H - ch))
 
-key = f"{cols}x{rows} {W}x{H} {wid}x{hid}@{left_cell}x{top_cell} p={right_pad},{bottom_pad}"
+key = f"{cols}x{rows} {W}x{H} {wid}x{hid}@{left_cell}x{top_cell} p={right_pad},{bottom_pad} src={src}"
 prev = meta_path.read_text().strip() if meta_path.exists() else ""
 if key != prev or not out.exists():
     from PIL import Image

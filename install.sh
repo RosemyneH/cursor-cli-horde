@@ -13,13 +13,16 @@ if [[ ! -f "$root/assets/horde-bg-corner.png" ]]; then
   fi
 fi
 
-mkdir -p "$dest/assets" "$dest/hooks"
+mkdir -p "$dest/assets" "$dest/assets/icons" "$dest/hooks"
 install -m 0755 "$root/statusline.sh" "$dest/statusline.sh"
 install -m 0755 "$root/kitty-image.sh" "$dest/kitty-image.sh"
 install -m 0755 "$root/hooks/session-art.sh" "$dest/hooks/session-art.sh"
 install -m 0644 "$root/hooks.json" "$dest/hooks.json"
 install -m 0644 "$root/assets/horde-agent.png" "$dest/assets/horde-agent.png"
 install -m 0644 "$root/assets/horde-bg-corner.png" "$dest/assets/horde-bg-corner.png"
+if [[ -d "$root/assets/icons" ]]; then
+  install -m 0644 "$root/assets/icons/"*.png "$dest/assets/icons/"
+fi
 
 python3 - "$dest" <<'PY'
 import json, sys

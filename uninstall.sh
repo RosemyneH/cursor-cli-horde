@@ -16,14 +16,10 @@ rm -f \
   "$dest/assets/horde-bg-corner.png" \
   "$dest/assets/.horde-placed" \
   "$dest/assets/.horde-bg-size" \
-  "$dest/assets/.horde-watch.lock"
+  "$dest/assets/.horde-watch.lock" \
+  "$dest/assets/.horde-icon-i"
 
-# Drop legacy assets from older installs
-rm -f \
-  "$dest/assets/horde-status.icat" \
-  "$dest/assets/horde.ansi" \
-  "$dest/assets/horde-grid.png" \
-  "$dest/assets/horde-agent-cut.png"
+rm -rf "$dest/assets/icons"
 
 python3 - "$dest" <<'PY'
 import json, sys

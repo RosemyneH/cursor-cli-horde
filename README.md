@@ -74,15 +74,22 @@ keep the crest in the under-chat gutter.
 
 | Env | Default | Meaning |
 |---|---|---|
+| `HORDE_ICON` | `crest` | Icon name, or `cycle` / `random` |
+| `HORDE_ICONS_DIR` | `~/.cursor/assets/icons` | Icon pack directory |
 | `HORDE_CREST_COLS` | `7` | Crest width in cells |
 | `HORDE_CREST_ROWS` | `5` | Crest height in cells |
 | `HORDE_PAD_RIGHT` | `1` | Cells inset from the right edge |
 | `HORDE_PAD_BOTTOM` | `0` | Cells inset from the bottom edge |
 
 ```bash
-HORDE_CREST_COLS=9 HORDE_CREST_ROWS=6 ~/.cursor/kitty-image.sh
-kitten @ set-background-image none   # hide
+HORDE_ICON=skull ~/.cursor/kitty-image.sh
+HORDE_ICON=cycle ~/.cursor/kitty-image.sh   # rotate through the pack
+HORDE_ICON=axe-wow ~/.cursor/kitty-image.sh
+kitten @ set-background-image none          # hide
 ```
+
+Pack includes: `crest`, `axe`, `skull`, `wolf`, `fist`, `hammer`, `potion`, `shield`,
+plus painted `axe-wow` / `skull-wow`.
 
 A session-start watcher re-applies every ~0.5s so pure resizes (no chat activity)
 still re-anchor.
@@ -128,8 +135,9 @@ Status stdout stays text-only (⚔, rage bar, path/branch).
 statusline.sh              status text (model, rage bar, meta)
 kitty-image.sh             set-background-image helper
 hooks/session-art.sh       sessionStart → place crest
-assets/horde-agent.png     source crest (transparent)
-assets/horde-bg-corner.png canvas with crest bottom-right
+assets/horde-agent.png     legacy crest path (still installed)
+assets/icons/*.png         WoW icon pack (crest, axe, skull, …)
+assets/horde-bg-corner.png runtime canvas (bottom-right)
 scripts/build-corner-bg.sh rebuild the canvas
 install.sh / uninstall.sh  setup / removal
 ```
