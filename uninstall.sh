@@ -14,7 +14,9 @@ rm -f \
   "$dest/hooks/session-art.sh" \
   "$dest/assets/horde-agent.png" \
   "$dest/assets/horde-bg-corner.png" \
-  "$dest/assets/.horde-placed"
+  "$dest/assets/.horde-placed" \
+  "$dest/assets/.horde-bg-size" \
+  "$dest/assets/.horde-watch.lock"
 
 # Drop legacy assets from older installs
 rm -f \

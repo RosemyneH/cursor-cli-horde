@@ -13,15 +13,9 @@ H=$'\033[38;2;232;56;48m'
 HG=$'\033[38;2;232;186;64m'
 R=$'\033[0m'
 
-# ʕ ◕ᴥ◕ ʔ✿ crest via kitty background image — icat --place dies on TUI redraw ✿ ʕ ◕ᴥ◕ ʔ
+# ʕ ◕ᴥ◕ ʔ✿ resize-safe crest: rebuild canvas when window W×H changes ✿ ʕ ◕ᴥ◕ ʔ
 if [[ -n "${KITTY_LISTEN_ON:-}" ]]; then
-  stamp="$HOME/.cursor/assets/.horde-placed"
-  now=$(date +%s)
-  prev=$(cat "$stamp" 2>/dev/null || echo 0)
-  if (( now - prev >= 5 )); then
-    printf '%s' "$now" > "$stamp"
-    "$HOME/.cursor/kitty-image.sh" &
-  fi
+  "$HOME/.cursor/kitty-image.sh" >/dev/null 2>&1 &
 fi
 
 model=$(printf '%s' "$payload" | jq -r '.model.display_name // "agent"')
